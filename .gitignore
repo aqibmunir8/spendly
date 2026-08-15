@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment / secrets
+.env
+*.local
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# SQLite database (keep the schema, not the data)
+*.db
+*.sqlite3
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
