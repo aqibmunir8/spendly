@@ -39,7 +39,7 @@ Match the style of terms.html.
 footer link href from "#" to "/privacy".
 4. Make sure the appearance looks like the website's theme
 
-git commit -m "landing: add privacy policy page and route”
+git commit -m "landing: add privacy policy page and route"
 
 I've attached a screenshot of the updated Spendly hero section design.
 
