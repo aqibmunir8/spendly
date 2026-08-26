@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Spendly{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- User Info Card -->
+    <div class="profile-section">
+        <div class="user-card">
+            <div class="user-avatar">{{ user.initials }}</div>
+            <h1 class="user-name">{{ user.name }}</h1>
+            <p class="user-email">{{ user.email }}</p>
+            <p class="user-meta">Member since {{ user.member_since }}</p>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="profile-section">
+        <h2 class="section-title">Overview</h2>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value">₹{{ "%.2f"|format(stats.total_spent) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ stats.transaction_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Category</div>
+                <div class="stat-value">{{ stats.top_category }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="profile-section">
+        <h2 class="section-title">Recent Transactions</h2>
+        <div class="table-container">
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td class="transaction-date">{{ transaction.date }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td>
+                            <span class="category-badge badge-{{ transaction.category|lower }}">
+                                {{ transaction.category }}
+                            </span>
+                        </td>
+                        <td class="transaction-amount">₹{{ "%.2f"|format(transaction.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Category Breakdown -->
+    <div class="profile-section">
+        <h2 class="section-title">Spending by Category</h2>
+        <div class="category-list">
+            {% for category in categories %}
+            <div class="category-row">
+                <div class="category-name">{{ category.name }}</div>
+                <div class="category-bar">
+                    <div class="category-bar-fill bar-{{ category.name|lower }}" data-percentage="{{ category.percentage }}"></div>
+                </div>
+                <div class="category-total">₹{{ "%.2f"|format(category.total) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const bars = document.querySelectorAll('.category-bar-fill');
+        bars.forEach(bar => {
+            const percentage = bar.getAttribute('data-percentage');
+            bar.style.width = percentage + '%';
+        });
+    });
+</script>
+{% endblock %}

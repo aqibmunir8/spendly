@@ -770,3 +770,295 @@ a { color: inherit; text-decoration: none; }
     .nav-links a:not(.nav-cta) { display: none; }
     .hero { padding: 3rem 1rem 2rem; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Profile Page                                                       */
+/* ------------------------------------------------------------------ */
+
+.profile-page {
+    padding: 3rem 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.profile-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+}
+
+/* User Card */
+.user-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    text-align: center;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0 auto 1rem;
+}
+
+.user-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+}
+
+.user-email {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+}
+
+.user-meta {
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+}
+
+/* Stats */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* Transaction Table */
+.table-container {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table thead {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--border);
+}
+
+.transactions-table th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.transactions-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 0.9rem;
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transactions-table tbody tr:hover {
+    background: var(--paper-warm);
+}
+
+.transaction-date {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+}
+
+.transaction-amount {
+    text-align: right;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* Category Badges */
+.category-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-food {
+    background: var(--accent-2-light);
+    color: var(--accent-2);
+}
+
+.badge-transport {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge-bills {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.badge-health {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.badge-entertainment {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.badge-shopping {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.badge-other {
+    background: #f5f5f5;
+    color: #616161;
+}
+
+/* Category Breakdown */
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+}
+
+.category-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 80px;
+    align-items: center;
+    gap: 1rem;
+}
+
+.category-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+}
+
+.category-bar {
+    height: 8px;
+    background: var(--border-soft);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.category-total {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.bar-health { background: #c2185b; }
+.bar-bills { background: #f57c00; }
+.bar-shopping { background: #388e3c; }
+.bar-food { background: var(--accent-2); }
+.bar-entertainment { background: #7b1fa2; }
+.bar-other { background: #616161; }
+.bar-transport { background: #1976d2; }
+
+/* Navbar User Display */
+.nav-user {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    margin-right: 1rem;
+}
+
+/* Responsive Profile */
+@media (max-width: 768px) {
+    .profile-page {
+        padding: 2rem 1rem;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .category-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .category-total {
+        text-align: left;
+    }
+
+    .transactions-table thead {
+        display: none;
+    }
+
+    .transactions-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+    }
+
+    .transactions-table td {
+        display: block;
+        text-align: left;
+        padding: 0.5rem 1rem;
+        border-bottom: none;
+    }
+
+    .transactions-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.8rem;
+        color: var(--ink-muted);
+    }
+}

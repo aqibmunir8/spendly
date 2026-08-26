@@ -11,6 +11,13 @@ with app.app_context():
     seed_db()
 
 
+@app.context_processor
+def inject_user():
+    if 'user_id' in session:
+        return {'current_user': {'name': 'Nitish Kumar'}}
+    return {}
+
+
 # ------------------------------------------------------------------ #
 # Routes                                                              #
 # ------------------------------------------------------------------ #
@@ -101,7 +108,40 @@ def logout():
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return "Profile page — coming in Step 4"
+
+    user = {
+        'name': 'Nitish Kumar',
+        'email': 'nitish@example.com',
+        'initials': 'NK',
+        'member_since': 'August 2026'
+    }
+
+    stats = {
+        'total_spent': 409.85,
+        'transaction_count': 8,
+        'top_category': 'Health'
+    }
+
+    transactions = [
+        {'date': '2026-08-22', 'description': 'Lunch at cafe', 'category': 'Food', 'amount': 18.75},
+        {'date': '2026-08-20', 'description': 'Birthday gift', 'category': 'Other', 'amount': 25.50},
+        {'date': '2026-08-18', 'description': 'New running shoes', 'category': 'Shopping', 'amount': 67.80},
+        {'date': '2026-08-15', 'description': 'Movie tickets', 'category': 'Entertainment', 'amount': 35.00},
+        {'date': '2026-08-12', 'description': 'Doctor appointment', 'category': 'Health', 'amount': 120.00}
+    ]
+
+    categories = [
+        {'name': 'Health', 'total': 120.00, 'percentage': 29},
+        {'name': 'Bills', 'total': 85.30, 'percentage': 21},
+        {'name': 'Shopping', 'total': 67.80, 'percentage': 17},
+        {'name': 'Food', 'total': 64.25, 'percentage': 16},
+        {'name': 'Entertainment', 'total': 35.00, 'percentage': 9},
+        {'name': 'Other', 'total': 25.50, 'percentage': 6},
+        {'name': 'Transport', 'total': 12.00, 'percentage': 3}
+    ]
+
+    return render_template('profile.html', user=user, stats=stats,
+                          transactions=transactions, categories=categories)
 
 
 @app.route("/expenses/add")
