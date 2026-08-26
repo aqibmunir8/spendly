@@ -1,5 +1,5 @@
 import sqlite3
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_db():
@@ -115,4 +115,9 @@ def create_user(name, email, password_hash):
     conn.commit()
     conn.close()
     return user_id
+
+
+def verify_password(password_hash, password):
+    """Verify a plaintext password against a stored hash."""
+    return check_password_hash(password_hash, password)
 
