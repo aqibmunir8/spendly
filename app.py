@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash
 from database.db import init_db, seed_db, get_user_by_email, create_user, verify_password
+from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
@@ -14,7 +15,9 @@ with app.app_context():
 @app.context_processor
 def inject_user():
     if 'user_id' in session:
-        return {'current_user': {'name': 'Nitish Kumar'}}
+        user = get_user_by_id(session['user_id'])
+        if user:
+            return {'current_user': {'name': user['name']}}
     return {}
 
 
@@ -109,36 +112,18 @@ def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    user = {
-        'name': 'Nitish Kumar',
-        'email': 'nitish@example.com',
-        'initials': 'NK',
-        'member_since': 'August 2026'
-    }
+    user_id = session['user_id']
+    user = get_user_by_id(user_id)
 
-    stats = {
-        'total_spent': 409.85,
-        'transaction_count': 8,
-        'top_category': 'Health'
-    }
+    if not user:
+        session.clear()
+        return redirect(url_for('login'))
 
-    transactions = [
-        {'date': '2026-08-22', 'description': 'Lunch at cafe', 'category': 'Food', 'amount': 18.75},
-        {'date': '2026-08-20', 'description': 'Birthday gift', 'category': 'Other', 'amount': 25.50},
-        {'date': '2026-08-18', 'description': 'New running shoes', 'category': 'Shopping', 'amount': 67.80},
-        {'date': '2026-08-15', 'description': 'Movie tickets', 'category': 'Entertainment', 'amount': 35.00},
-        {'date': '2026-08-12', 'description': 'Doctor appointment', 'category': 'Health', 'amount': 120.00}
-    ]
+    stats = get_summary_stats(user_id)
 
-    categories = [
-        {'name': 'Health', 'total': 120.00, 'percentage': 29},
-        {'name': 'Bills', 'total': 85.30, 'percentage': 21},
-        {'name': 'Shopping', 'total': 67.80, 'percentage': 17},
-        {'name': 'Food', 'total': 64.25, 'percentage': 16},
-        {'name': 'Entertainment', 'total': 35.00, 'percentage': 9},
-        {'name': 'Other', 'total': 25.50, 'percentage': 6},
-        {'name': 'Transport', 'total': 12.00, 'percentage': 3}
-    ]
+    transactions = get_recent_transactions(user_id, limit=10)
+
+    categories = get_category_breakdown(user_id)
 
     return render_template('profile.html', user=user, stats=stats,
                           transactions=transactions, categories=categories)
