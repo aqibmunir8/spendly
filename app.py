@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import init_db, seed_db, get_user_by_email, create_user, verify_password
 from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown
@@ -19,6 +20,49 @@ def inject_user():
         if user:
             return {'current_user': {'name': user['name']}}
     return {}
+
+
+def calculate_preset_dates(today):
+    """Calculate date ranges for preset filters."""
+    this_month_start = today.replace(day=1)
+    three_months_ago = today - timedelta(days=90)
+    six_months_ago = today - timedelta(days=180)
+
+    return {
+        'this_month': {
+            'from': this_month_start.strftime('%Y-%m-%d'),
+            'to': today.strftime('%Y-%m-%d')
+        },
+        'three_months': {
+            'from': three_months_ago.strftime('%Y-%m-%d'),
+            'to': today.strftime('%Y-%m-%d')
+        },
+        'six_months': {
+            'from': six_months_ago.strftime('%Y-%m-%d'),
+            'to': today.strftime('%Y-%m-%d')
+        }
+    }
+
+
+def detect_active_preset(date_from_obj, date_to_obj):
+    """Determine which preset button should be highlighted."""
+    today = date.today()
+    presets = calculate_preset_dates(today)
+
+    date_from_str = date_from_obj.strftime('%Y-%m-%d')
+    date_to_str = date_to_obj.strftime('%Y-%m-%d')
+
+    if (date_from_str == presets['this_month']['from'] and
+        date_to_str == presets['this_month']['to']):
+        return 'this_month'
+    elif (date_from_str == presets['three_months']['from'] and
+          date_to_str == presets['three_months']['to']):
+        return 'three_months'
+    elif (date_from_str == presets['six_months']['from'] and
+          date_to_str == presets['six_months']['to']):
+        return 'six_months'
+    else:
+        return 'custom'
 
 
 # ------------------------------------------------------------------ #
@@ -119,14 +163,45 @@ def profile():
         session.clear()
         return redirect(url_for('login'))
 
-    stats = get_summary_stats(user_id)
+    # Extract and validate date parameters
+    date_from_str = request.args.get('date_from')
+    date_to_str = request.args.get('date_to')
 
-    transactions = get_recent_transactions(user_id, limit=10)
+    date_from = None
+    date_to = None
+    active_preset = 'all'
 
-    categories = get_category_breakdown(user_id)
+    # Both params must be present together or neither
+    if date_from_str or date_to_str:
+        if not (date_from_str and date_to_str):
+            flash('Both start and end dates are required.', 'error')
+        else:
+            try:
+                date_from_obj = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+                date_to_obj = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+
+                if date_from_obj > date_to_obj:
+                    flash('Start date must be before end date.', 'error')
+                else:
+                    date_from = date_from_str
+                    date_to = date_to_str
+                    active_preset = detect_active_preset(date_from_obj, date_to_obj)
+            except ValueError:
+                pass  # Silently fall back to unfiltered
+
+    # Query data with optional date filter
+    stats = get_summary_stats(user_id, date_from, date_to)
+    transactions = get_recent_transactions(user_id, limit=10, date_from=date_from, date_to=date_to)
+    categories = get_category_breakdown(user_id, date_from, date_to)
+
+    # Calculate preset dates for template
+    today = date.today()
+    presets = calculate_preset_dates(today)
 
     return render_template('profile.html', user=user, stats=stats,
-                          transactions=transactions, categories=categories)
+                          transactions=transactions, categories=categories,
+                          active_preset=active_preset, date_from=date_from,
+                          date_to=date_to, presets=presets)
 
 
 @app.route("/expenses/add")

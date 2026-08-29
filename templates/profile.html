@@ -4,6 +4,15 @@
 
 {% block content %}
 <div class="profile-page">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <!-- User Info Card -->
     <div class="profile-section">
         <div class="user-card">
@@ -11,6 +20,37 @@
             <h1 class="user-name">{{ user.name }}</h1>
             <p class="user-email">{{ user.email }}</p>
             <p class="user-meta">Member since {{ user.member_since }}</p>
+        </div>
+    </div>
+
+    <!-- Date Filter Bar -->
+    <div class="profile-section">
+        <div class="filter-bar">
+            <a href="{{ url_for('profile') }}"
+               class="filter-preset-btn {% if active_preset == 'all' %}active{% endif %}">
+                All Time
+            </a>
+            <a href="{{ url_for('profile', date_from=presets.this_month.from, date_to=presets.this_month.to) }}"
+               class="filter-preset-btn {% if active_preset == 'this_month' %}active{% endif %}">
+                This Month
+            </a>
+            <a href="{{ url_for('profile', date_from=presets.three_months.from, date_to=presets.three_months.to) }}"
+               class="filter-preset-btn {% if active_preset == 'three_months' %}active{% endif %}">
+                Last 3 Months
+            </a>
+            <a href="{{ url_for('profile', date_from=presets.six_months.from, date_to=presets.six_months.to) }}"
+               class="filter-preset-btn {% if active_preset == 'six_months' %}active{% endif %}">
+                Last 6 Months
+            </a>
+
+            <form method="GET" action="{{ url_for('profile') }}" class="filter-custom">
+                <input type="date" id="date_from" name="date_from"
+                       class="filter-date-input" value="{{ date_from or '' }}">
+                <span class="filter-separator">to</span>
+                <input type="date" id="date_to" name="date_to"
+                       class="filter-date-input" value="{{ date_to or '' }}">
+                <button type="submit" class="filter-apply-btn">Apply</button>
+            </form>
         </div>
     </div>
 
@@ -33,50 +73,55 @@
         </div>
     </div>
 
-    <!-- Transaction History -->
+    <!-- Transaction History and Category Breakdown -->
     <div class="profile-section">
-        <h2 class="section-title">Recent Transactions</h2>
-        <div class="table-container">
-            <table class="transactions-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in transactions %}
-                    <tr>
-                        <td class="transaction-date">{{ transaction.date }}</td>
-                        <td>{{ transaction.description }}</td>
-                        <td>
-                            <span class="category-badge badge-{{ transaction.category|lower }}">
-                                {{ transaction.category }}
-                            </span>
-                        </td>
-                        <td class="transaction-amount">₹{{ "%.2f"|format(transaction.amount) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Category Breakdown -->
-    <div class="profile-section">
-        <h2 class="section-title">Spending by Category</h2>
-        <div class="category-list">
-            {% for category in categories %}
-            <div class="category-row">
-                <div class="category-name">{{ category.name }}</div>
-                <div class="category-bar">
-                    <div class="category-bar-fill bar-{{ category.name|lower }}" data-percentage="{{ category.percentage }}"></div>
+        <div class="content-grid">
+            <div class="content-main">
+                <h2 class="section-title">Recent Transactions</h2>
+                <div class="table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td class="transaction-date">{{ transaction.date }}</td>
+                                <td>{{ transaction.description }}</td>
+                                <td>
+                                    <span class="category-badge badge-{{ transaction.category|lower }}">
+                                        {{ transaction.category }}
+                                    </span>
+                                </td>
+                                <td class="transaction-amount">₹{{ "%.2f"|format(transaction.amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="category-total">₹{{ "%.2f"|format(category.total) }}</div>
             </div>
-            {% endfor %}
+
+            <div class="content-sidebar">
+                <h2 class="section-title">By Category</h2>
+                <div class="category-list">
+                    {% for category in categories %}
+                    <div class="category-row">
+                        <div class="category-header">
+                            <div class="category-name">{{ category.name }}</div>
+                            <div class="category-total">₹{{ "%.2f"|format(category.total) }}</div>
+                        </div>
+                        <div class="category-bar">
+                            <div class="category-bar-fill bar-{{ category.name|lower }}" data-percentage="{{ category.percentage }}"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
