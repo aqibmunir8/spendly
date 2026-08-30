@@ -197,7 +197,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
 
     if date_from and date_to:
         cursor.execute(
-            'SELECT date, description, category, amount '
+            'SELECT id, date, description, category, amount '
             'FROM expenses '
             'WHERE user_id = ? AND date BETWEEN ? AND ? '
             'ORDER BY date DESC, created_at DESC '
@@ -206,7 +206,7 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
         )
     else:
         cursor.execute(
-            'SELECT date, description, category, amount '
+            'SELECT id, date, description, category, amount '
             'FROM expenses '
             'WHERE user_id = ? '
             'ORDER BY date DESC, created_at DESC '
@@ -246,3 +246,61 @@ def insert_expense(user_id, amount, category, date, description=None):
     expense_id = cursor.lastrowid
     conn.close()
     return expense_id
+
+
+def get_expense_by_id(expense_id, user_id):
+    """
+    Fetch a single expense by ID, scoped to the given user.
+
+    Args:
+        expense_id: Integer expense ID
+        user_id: Integer user ID (for ownership verification)
+
+    Returns:
+        Dict with keys: id, user_id, amount, category, date, description, created_at
+        or None if expense not found or doesn't belong to user
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT id, user_id, amount, category, date, description, created_at '
+        'FROM expenses '
+        'WHERE id = ? AND user_id = ?',
+        (expense_id, user_id)
+    )
+    row = cursor.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
+
+
+def update_expense(expense_id, user_id, amount, category, date, description=None):
+    """
+    Update an expense record, scoped to the given user for ownership safety.
+
+    Args:
+        expense_id: Integer expense ID
+        user_id: Integer user ID (for ownership verification)
+        amount: Float amount of the expense (must be > 0)
+        category: String category name (must be one of the fixed 7 options)
+        date: ISO date string (YYYY-MM-DD)
+        description: Optional string description, or None if blank
+
+    Returns:
+        Number of rows affected (1 if successful, 0 if not found or not owned)
+
+    Note: Caller must ensure validation has been done; this function only
+    updates and returns the count of affected rows.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? '
+        'WHERE id = ? AND user_id = ?',
+        (amount, category, date, description, expense_id, user_id)
+    )
+    conn.commit()
+    rows_affected = cursor.rowcount
+    conn.close()
+
+    return rows_affected

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_expense.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1 class="auth-title">Edit Expense</h1>
+            <p class="auth-subtitle">Update your expense details</p>
+        </div>
+
+        <div class="auth-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if errors %}
+                <div class="flash error">
+                    <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('edit_expense', id=expense.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="amount">Amount (₹)</label>
+                    <input type="number" id="amount" name="amount" class="form-control" step="0.01" min="0.01"
+                           placeholder="Enter amount" value="{{ expense.amount }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" class="form-control" required>
+                        <option value="" disabled {% if not expense.category %}selected{% endif %}>Select a category</option>
+                        <option value="Food" {% if expense.category == 'Food' %}selected{% endif %}>Food</option>
+                        <option value="Transport" {% if expense.category == 'Transport' %}selected{% endif %}>Transport</option>
+                        <option value="Bills" {% if expense.category == 'Bills' %}selected{% endif %}>Bills</option>
+                        <option value="Health" {% if expense.category == 'Health' %}selected{% endif %}>Health</option>
+                        <option value="Entertainment" {% if expense.category == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+                        <option value="Shopping" {% if expense.category == 'Shopping' %}selected{% endif %}>Shopping</option>
+                        <option value="Other" {% if expense.category == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" class="form-control"
+                           value="{{ expense.date }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description (optional)</label>
+                    <input type="text" id="description" name="description" class="form-control"
+                           placeholder="Optional - up to 200 characters"
+                           maxlength="200"
+                           value="{{ expense.description or '' }}">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-submit">Save Changes</button>
+                    <a href="{{ url_for('profile') }}" class="btn btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
