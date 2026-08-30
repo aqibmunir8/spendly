@@ -119,6 +119,11 @@ a {
   color: var(--ink);
 }
 
+.nav-links a.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .nav-cta {
   background: var(--ink) !important;
   color: var(--paper) !important;
@@ -1279,6 +1284,55 @@ a {
 }
 .bar-transport {
   background: #1976d2;
+}
+
+/* ------------------------------------------------------------------ */
+/* Analytics coming soon                                               */
+/* ------------------------------------------------------------------ */
+
+.analytics-page {
+  padding: 4rem 2rem 5rem;
+}
+
+.analytics-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.analytics-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--ink);
+  margin: 1.25rem 0 1rem;
+  line-height: 1.2;
+}
+
+.analytics-lede {
+  font-size: 1.05rem;
+  color: var(--ink-muted);
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+.analytics-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  text-align: left;
+  margin-bottom: 2.5rem;
+}
+
+.analytics-actions {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .analytics-preview {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Navbar User Display */

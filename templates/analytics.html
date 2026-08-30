@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — Spendly{% endblock %}
+
+{% block content %}
+<section class="analytics-page">
+    <div class="analytics-inner">
+        <div class="hero-badge">Coming soon</div>
+        <h1 class="analytics-title">
+            Analytics is on the way.
+        </h1>
+        <p class="analytics-lede">
+            Charts, trends, and spending insights are being built.
+            You’ll soon see where every rupee goes — by category, month, and habit.
+        </p>
+
+        <div class="analytics-preview">
+            <div class="feature-card">
+                <div class="feature-icon">◎</div>
+                <h3 class="feature-title">Spending trends</h3>
+                <p class="feature-body">Month-over-month charts so you can spot spikes before they become a problem.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">₹</div>
+                <h3 class="feature-title">Category insights</h3>
+                <p class="feature-body">See which categories eat the budget and how they shift over time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">◷</div>
+                <h3 class="feature-title">Custom ranges</h3>
+                <p class="feature-body">Filter any period — this month, last quarter, or a range you choose.</p>
+            </div>
+        </div>
+
+        <div class="analytics-actions">
+            <a href="{{ url_for('profile') }}" class="btn-primary">Back to profile</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
