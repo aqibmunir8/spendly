@@ -218,3 +218,31 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
 
     # Convert Row objects to dicts
     return [dict(row) for row in rows]
+
+
+def insert_expense(user_id, amount, category, date, description=None):
+    """
+    Insert a new expense record for a user.
+
+    Args:
+        user_id: Integer user ID
+        amount: Float amount of the expense (must be > 0)
+        category: String category name (must be one of the fixed 7 options)
+        date: ISO date string (YYYY-MM-DD)
+        description: Optional string description, or None if blank
+
+    Returns:
+        The row id of the newly inserted expense
+
+    Note: Caller must ensure user_id matches the authenticated user.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)',
+        (user_id, amount, category, date, description)
+    )
+    conn.commit()
+    expense_id = cursor.lastrowid
+    conn.close()
+    return expense_id
