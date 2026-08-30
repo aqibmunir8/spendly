@@ -1,10 +1,12 @@
 import os
 import secrets
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import init_db, seed_db, get_user_by_email, create_user, verify_password
-from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown, insert_expense
+from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown, insert_expense, get_expense_by_id, update_expense
+
+VALID_CATEGORIES = ['Food', 'Transport', 'Bills', 'Health', 'Entertainment', 'Shopping', 'Other']
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
@@ -18,6 +20,50 @@ def generate_csrf_token():
 
 def validate_csrf_token(token):
     return token == session.get('csrf_token')
+
+
+def validate_expense_form(amount_str, category, date_str, valid_categories):
+    """
+    Validate expense form inputs. Returns (amount, parsed_date, errors).
+    If errors list is non-empty, amount and parsed_date may be None.
+    """
+    errors = []
+    amount = None
+    parsed_date = None
+
+    # Amount validation
+    if not amount_str:
+        errors.append("Amount is required.")
+    else:
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                errors.append("Amount must be greater than zero.")
+        except ValueError:
+            errors.append("Amount must be a valid number.")
+
+    # Category validation
+    if not category:
+        errors.append("Category is required.")
+    elif category not in valid_categories:
+        errors.append("Invalid category selected.")
+
+    # Date validation
+    if not date_str:
+        errors.append("Date is required.")
+    else:
+        try:
+            parsed_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+            today = date.today()
+            ten_years_ago = today - timedelta(days=3650)
+            if parsed_date > today:
+                errors.append("Date cannot be in the future.")
+            elif parsed_date < ten_years_ago:
+                errors.append("Date cannot be more than 10 years in the past.")
+        except ValueError:
+            errors.append("Date must be in YYYY-MM-DD format.")
+
+    return amount, parsed_date, errors
 
 with app.app_context():
     init_db()
@@ -255,38 +301,8 @@ def add_expense():
     date_str = request.form.get('date', '').strip()
     description = request.form.get('description', '').strip() or None
 
-    # Valid categories
-    valid_categories = ['Food', 'Transport', 'Bills', 'Health', 'Entertainment', 'Shopping', 'Other']
-
-    errors = []
-
-    # Validate amount
-    try:
-        amount = float(amount_str)
-        if amount <= 0:
-            errors.append('Amount must be greater than zero.')
-    except ValueError:
-        errors.append('Please enter a valid amount.')
-        amount = None
-
-    # Validate category
-    if not category:
-        errors.append('Please select a category.')
-    elif category not in valid_categories:
-        errors.append('Please select a valid category.')
-
-    # Validate date
-    if not date_str:
-        errors.append('Please select a date.')
-    else:
-        try:
-            expense_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            if expense_date > date.today():
-                errors.append('Date cannot be in the future.')
-            elif expense_date < date.today() - timedelta(days=365*10):
-                errors.append('Date cannot be more than 10 years in the past.')
-        except ValueError:
-            errors.append('Please enter a valid date (YYYY-MM-DD).')
+    # Validate form
+    amount, expense_date, errors = validate_expense_form(amount_str, category, date_str, VALID_CATEGORIES)
 
     # If there are validation errors, re-render the form
     if errors:
@@ -304,9 +320,65 @@ def add_expense():
     return redirect(url_for('profile'))
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    # Auth check
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    # GET: Load and render form
+    if request.method == "GET":
+        expense = get_expense_by_id(id, session["user_id"])
+        if not expense:
+            abort(404)
+
+        return render_template(
+            "edit_expense.html",
+            expense=expense,
+            categories=VALID_CATEGORIES
+        )
+
+    # POST: Validate and update
+    # CSRF validation
+    if not validate_csrf_token(request.form.get("csrf_token")):
+        return redirect(url_for("login"))
+
+    # Verify ownership before processing
+    expense = get_expense_by_id(id, session["user_id"])
+    if not expense:
+        abort(404)
+
+    # Extract form data
+    amount_str = request.form.get("amount", "").strip()
+    category = request.form.get("category", "").strip()
+    date_str = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip() or None
+
+    # Validate form
+    amount, parsed_date, errors = validate_expense_form(amount_str, category, date_str, VALID_CATEGORIES)
+
+    # Re-render with errors if validation failed
+    if errors:
+        submitted_expense = {
+            "id": id,
+            "amount": amount_str,
+            "category": category,
+            "date": date_str,
+            "description": description
+        }
+        return render_template(
+            "edit_expense.html",
+            expense=submitted_expense,
+            categories=VALID_CATEGORIES,
+            errors=errors
+        )
+
+    # Update database
+    rows_updated = update_expense(id, session["user_id"], amount, category, date_str, description)
+    if rows_updated == 0:
+        abort(404)
+    flash("Expense updated successfully!", "success")
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/delete")
