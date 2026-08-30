@@ -204,6 +204,21 @@ def profile():
                           date_to=date_to, presets=presets)
 
 
+@app.route("/analytics")
+def analytics():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    user = get_user_by_id(user_id)
+
+    if not user:
+        session.clear()
+        return redirect(url_for('login'))
+
+    return render_template("analytics.html")
+
+
 @app.route("/expenses/add")
 def add_expense():
     return "Add expense — coming in Step 7"
