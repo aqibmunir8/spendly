@@ -1,12 +1,23 @@
 import os
+import secrets
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import init_db, seed_db, get_user_by_email, create_user, verify_password
-from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown
+from database.queries import get_user_by_id, get_summary_stats, get_recent_transactions, get_category_breakdown, insert_expense
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
+
+
+def generate_csrf_token():
+    if 'csrf_token' not in session:
+        session['csrf_token'] = secrets.token_hex(16)
+    return session['csrf_token']
+
+
+def validate_csrf_token(token):
+    return token == session.get('csrf_token')
 
 with app.app_context():
     init_db()
@@ -15,11 +26,12 @@ with app.app_context():
 
 @app.context_processor
 def inject_user():
+    context = {'csrf_token': generate_csrf_token}
     if 'user_id' in session:
         user = get_user_by_id(session['user_id'])
         if user:
-            return {'current_user': {'name': user['name']}}
-    return {}
+            context['current_user'] = {'name': user['name']}
+    return context
 
 
 def calculate_preset_dates(today):
@@ -219,9 +231,77 @@ def analytics():
     return render_template("analytics.html")
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=['GET', 'POST'])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    # Check if user is authenticated
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'GET':
+        today_date = date.today().strftime('%Y-%m-%d')
+        return render_template('add_expense.html', today_date=today_date)
+
+    # POST - process form submission
+    user_id = session['user_id']
+
+    # Validate CSRF token
+    csrf_token = request.form.get('csrf_token', '')
+    if not validate_csrf_token(csrf_token):
+        return redirect(url_for('login'))
+
+    # Get form data
+    amount_str = request.form.get('amount', '').strip()
+    category = request.form.get('category', '').strip()
+    date_str = request.form.get('date', '').strip()
+    description = request.form.get('description', '').strip() or None
+
+    # Valid categories
+    valid_categories = ['Food', 'Transport', 'Bills', 'Health', 'Entertainment', 'Shopping', 'Other']
+
+    errors = []
+
+    # Validate amount
+    try:
+        amount = float(amount_str)
+        if amount <= 0:
+            errors.append('Amount must be greater than zero.')
+    except ValueError:
+        errors.append('Please enter a valid amount.')
+        amount = None
+
+    # Validate category
+    if not category:
+        errors.append('Please select a category.')
+    elif category not in valid_categories:
+        errors.append('Please select a valid category.')
+
+    # Validate date
+    if not date_str:
+        errors.append('Please select a date.')
+    else:
+        try:
+            expense_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            if expense_date > date.today():
+                errors.append('Date cannot be in the future.')
+            elif expense_date < date.today() - timedelta(days=365*10):
+                errors.append('Date cannot be more than 10 years in the past.')
+        except ValueError:
+            errors.append('Please enter a valid date (YYYY-MM-DD).')
+
+    # If there are validation errors, re-render the form
+    if errors:
+        return render_template('add_expense.html',
+                                errors=errors,
+                                amount=amount_str,
+                                category=category,
+                                date=date_str,
+                                description=request.form.get('description', ''))
+
+    # Insert the expense
+    insert_expense(user_id, amount, category, date_str, description)
+
+    flash('Expense added successfully.', 'success')
+    return redirect(url_for('profile'))
 
 
 @app.route("/expenses/<int:id>/edit")
