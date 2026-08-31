@@ -1221,6 +1221,44 @@ a {
   border: 1px solid #f5c6c2;
 }
 
+.flash-success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+/* Edit and Delete Links in Actions Column */
+.edit-link {
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-right: 0.75rem;
+  transition: color 0.2s;
+}
+
+.edit-link:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
+.btn-delete {
+  background: transparent;
+  color: var(--danger);
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-body);
+  transition: color 0.2s;
+}
+
+.btn-delete:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
 /* Responsive Filter Bar */
 @media (max-width: 1024px) {
   .filter-custom {

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"\nimport sys, json\ndata = json.load(sys.stdin)\ncmd = data.get('tool_input', {}).get('command', '')\nprotected = ['spendly.db', '.env', 'migrations/']\ndangerous = ['rm ', 'rm -', 'unlink ', 'truncate ', 'os.remove']\nfor d in dangerous:\n    if d in cmd:\n        for p in protected:\n            if p in cmd:\n                print(f'BLOCKED: Cannot run destructive command on protected file: {p}', file=__import__(\\\"sys\\\").stderr)\n                raise SystemExit(2)\n\""
+          }
+        ]
+      }
+    ]
+  }
+}
