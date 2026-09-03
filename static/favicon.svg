@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <!-- Outer Diamond Outline -->
+  <rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)" fill="none" stroke="#C23030" stroke-width="12" stroke-linejoin="miter" />
+  
+  <!-- Inner Solid Diamond -->
+  <rect x="38" y="38" width="24" height="24" transform="rotate(45 50 50)" fill="#C23030" />
+</svg>

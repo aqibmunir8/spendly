@@ -41,6 +41,8 @@
   --radius-sm: 0;
   --radius-md: 0;
   --radius-lg: 0;
+
+  --spacing-unit: 0.25rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -58,6 +60,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -65,11 +68,13 @@ body {
   background-image:
     radial-gradient(circle, var(--faint-grid) 1px, transparent 1px);
   background-size: 24px 24px;
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -108,16 +113,25 @@ a {
   font-size: 1rem;
   color: var(--ink);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  transition: opacity 0.2s;
+}
+
+.nav-brand:hover {
+  opacity: 0.8;
 }
 
 .brand-icon {
   color: var(--stamp-red);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .brand-name {
   color: var(--ink);
+  line-height: 1;
 }
 
 .nav-links {
@@ -183,7 +197,7 @@ a {
 /* ------------------------------------------------------------------ */
 
 .hero {
-  padding: 5rem 2rem 4rem;
+  padding: 6rem 2rem 5rem;
   max-width: 1200px;
   margin: 0 auto;
   border-bottom: 2px solid var(--ledger-rule);
@@ -201,22 +215,22 @@ a {
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 600;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.1rem 0.45rem;
   border: 2px solid var(--stamp-red);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 2.5rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 2rem;
   transform: rotate(-2deg);
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   color: var(--ink);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   font-weight: 600;
 }
 
@@ -226,13 +240,14 @@ a {
 }
 
 .hero-subtitle {
-  font-size: 1.05rem;
+  font-size: 1.125rem;
   color: var(--ink-soft);
-  line-height: 1.7;
-  margin-bottom: 2.5rem;
-  max-width: 600px;
+  line-height: 1.65;
+  margin-bottom: 2.75rem;
+  max-width: 580px;
   margin-left: auto;
   margin-right: auto;
+  font-weight: 400;
 }
 
 .hero-actions {
@@ -254,7 +269,7 @@ a {
 .mock-dashboard {
   background: var(--paper-card);
   border: 2px solid var(--ledger-rule);
-  padding: 2.5rem;
+  padding: 3rem;
   width: 100%;
   max-width: 820px;
   box-shadow:
@@ -294,23 +309,25 @@ a {
   font-family: var(--font-display);
   font-size: 0.7rem;
   color: var(--ink-muted);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .mock-stat-value {
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 2.125rem;
   font-weight: 600;
   color: var(--ink);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
+  margin-bottom: 0.625rem;
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 
 .mock-stat-change {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
+  line-height: 1.4;
 }
 
 .mock-stat-change.positive {
@@ -334,10 +351,10 @@ a {
 
 .mock-bar-row {
   display: grid;
-  grid-template-columns: 100px 1fr 80px;
+  grid-template-columns: 110px 1fr 90px;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 0;
+  gap: 1.75rem;
+  padding: 1.125rem 0;
   border-bottom: 1px solid var(--faint-grid);
 }
 
@@ -347,15 +364,15 @@ a {
 
 .mock-cat {
   font-family: var(--font-display);
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--ink);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .mock-bar-track {
-  height: 8px;
+  height: 10px;
   background: var(--faint-grid);
   overflow: hidden;
   position: relative;
@@ -378,10 +395,11 @@ a {
 
 .mock-bar-amount {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink);
   text-align: right;
+  letter-spacing: -0.01em;
 }
 
 /* ------------------------------------------------------------------ */
@@ -469,18 +487,18 @@ a {
 
 .feature-title {
   font-family: var(--font-display);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   color: var(--ink);
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .feature-body {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--ink-soft);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 /* ------------------------------------------------------------------ */
@@ -536,14 +554,17 @@ a {
 
 .auth-title {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 2.125rem;
   color: var(--ink);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
 }
 
 .auth-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   color: var(--ink-muted);
+  line-height: 1.5;
 }
 
 .auth-card {
@@ -578,21 +599,22 @@ a {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--ink-soft);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .form-input {
   width: 100%;
-  padding: 0.65rem 0.875rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--ink);
   background: var(--paper);
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  line-height: 1.5;
 }
 
 .form-input:focus {
@@ -807,7 +829,7 @@ a {
 .footer {
   background: var(--ink);
   color: var(--paper);
-  padding: 3rem 2rem;
+  padding: 3.5rem 2rem;
   text-align: center;
   border-top: 2px solid var(--ink);
 }
@@ -816,38 +838,42 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .footer .brand-icon {
   color: var(--stamp-red);
-  font-size: 1.5rem;
+  font-size: 1.625rem;
+  line-height: 1;
 }
 
 .footer-name {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  line-height: 1;
 }
 
 .footer-copy {
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   color: var(--ink-faint);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
+  line-height: 1.5;
 }
 
 .footer-inner a {
   color: var(--paper-warm);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
   transition: color 0.15s;
 }
 
 .footer-inner a:hover {
   color: #ffffff;
+  text-decoration-thickness: 2px;
 }
 
 /* ------------------------------------------------------------------ */
@@ -955,7 +981,23 @@ a {
     display: none;
   }
   .hero {
-    padding: 3rem 1rem 2rem;
+    padding: 4rem 1.5rem 3rem;
+  }
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  .mock-dashboard {
+    padding: 2rem 1.5rem;
+  }
+  .mock-stat-value {
+    font-size: 1.75rem;
+  }
+  .mock-bar-row {
+    grid-template-columns: 80px 1fr 70px;
+    gap: 1rem;
   }
 }
 
